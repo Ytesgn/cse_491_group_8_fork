@@ -32,9 +32,6 @@ namespace cse491_team8 {
     size_t portal_id_a; ///< Easy access to first portal CellType ID.
     size_t portal_id_b; ///< Easy access to second portal CellType ID.
 
-
-    std::set<size_t> delete_agents;
-
     /// Provide the agent with movement actions.
     void ConfigAgent(cse491::AgentBase & agent) override {
       agent.AddAction("up", MOVE_UP);
@@ -93,7 +90,7 @@ namespace cse491_team8 {
             {
                 move_set["Heal"] = std::make_tuple('h', 0);
             }
-            if (agent_strength >= 30)
+            if (agent_strength >= 20)
             {
                 move_set["Buff"] = std::make_tuple('s', 0.5);
             }
@@ -248,7 +245,7 @@ namespace cse491_team8 {
         return look_position;
     }
 
-    /// @brief Removes all items from agent
+    /// @brief Removes all items from other agent
     /// @param agent 
     /// @param other_agent 
     void DropItems(cse491::AgentBase & agent, cse491::AgentBase & other_agent)
@@ -257,11 +254,11 @@ namespace cse491_team8 {
         {
             if (item->IsOwnedBy(other_agent.GetID()))
             {
-                if (item->HasProperty("Strength") && agent.HasProperty("Strength"))
+                if (item->HasProperty("Strength") && other_agent.HasProperty("Strength"))
                 {
-                    auto agent_health = agent.GetProperty<int>("Strength");
+                    auto agent_health = other_agent.GetProperty<int>("Strength");
                     auto item_strength = item->GetProperty<int>("Strength");
-                    agent.SetProperty<int>("Strength", (int)(agent_health - item_strength));
+                    other_agent.SetProperty<int>("Strength", (int)(agent_health - item_strength));
                 }
                 item->SetUnowned();
                 item->SetPosition(other_agent.GetPosition());
@@ -395,11 +392,13 @@ namespace cse491_team8 {
               else if (repeat_input == 'Y' || repeat_input == 'y')
               {
                 DropItems(agent, agent);
-                agent.SetProperty<int>("Strength", 10);
+
                 agent.SetProperty<int>("Health", 100);
                 agent.SetProperty<int>("Direction", 0);
+                
                 agent.SetProperty<bool>("Battling", false);
                 other_agent.SetProperty<bool>("Battling", false);
+
                 agent.SetPosition(40, 3);
                 break;
               }
@@ -417,29 +416,25 @@ namespace cse491_team8 {
           agent.SetProperty<bool>("Battling", false);
           other_agent.SetProperty<bool>("Battling", false);
           DropItems(agent, other_agent);
-          // this->RemoveAgent(other_agent.GetName());
-          // auto killedagent = GetAgentID(other_agent.GetName());
-          // delete_agents.insert(killedagent);
           other_agent.SetProperty<bool>("Deleted", true);
-
         }
     }
 
-    // /// @brief Looks for adjacencies
-    // void UpdateWorld() override
-    // {
-    // }
+    /// @brief Looks for adjacencies
+    void UpdateWorld() override
+    {
+      
+    }
 
-    // /// Runs agents, updates the world.
-    // void Run() override
-    // {
-    //   run_over = false;
-    //   while (!run_over)
-    //   {
-    //     RunAgents();
-    //     UpdateWorld();
-    //   }
-    // }
+    /// Runs agents, updates the world.
+    void Run() override
+    {
+      run_over = false;
+      while (!run_over) {
+        RunAgents();
+        UpdateWorld();
+      }
+    }
 
       void RunAgents() override {
         for (auto & [id, agent_ptr] : agent_map) {
@@ -567,9 +562,7 @@ namespace cse491_team8 {
         {
             new_position = agent.GetPosition();
             look_position = LookAhead(agent);
-
-            if (!main_grid.IsValid(look_position)) { return agent.GetPosition(); }
-            if (main_grid.At(look_position) == tree_id)
+            if (main_grid.IsValid(look_position) && main_grid.At(look_position) == tree_id)
             {
                 DoActionTestNewPositionTree(agent, look_position);
             } else {
@@ -580,15 +573,13 @@ namespace cse491_team8 {
         case USE_BOAT:
         {
             new_position = agent.GetPosition();
-            if (!main_grid.IsValid(new_position)) { return agent.GetPosition(); }
             if (main_grid.At(new_position) == water_id)
             {
               agent.Notify("Already on Water");
               break;
             }
             look_position = LookAhead(agent);
-            if (!main_grid.IsValid(look_position)) { return agent.GetPosition(); }
-            if (main_grid.At(look_position) == water_id)
+            if (main_grid.IsValid(look_position) && main_grid.At(look_position) == water_id)
             {
                 if (DoActionTestNewPositionWater(agent))
                 {
@@ -608,8 +599,6 @@ namespace cse491_team8 {
         case HEAL:
         {
             new_position = agent.GetPosition();
-            if (!main_grid.IsValid(new_position)) { return agent.GetPosition(); }
-
             if (battling)
             {
                 move = 'h';
@@ -684,10 +673,10 @@ namespace cse491_team8 {
               {
                   agent_map[agent_id]->SetProperty<bool>("Battling", true);
                   StrengthCheck(*agent_map[agent_id], agent, move);
+                  new_position = agent.GetPosition();
               }
           }
       }
-      
 
       // assume new position is valid
       return new_position;
