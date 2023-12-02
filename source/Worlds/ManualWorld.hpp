@@ -21,7 +21,7 @@ namespace cse491_team8 {
   class ManualWorld : public cse491::WorldBase {
   protected:
     enum ActionType { REMAIN_STILL=0, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, USE_AXE, USE_BOAT, STATS, HEAL, RUN,
-            ATTACK, SPECIAL, BUFF, DEBUFF, HELP };
+            ATTACK, SPECIAL, BUFF, HELP };
     enum FacingDirection { UP=0, RIGHT, DOWN, LEFT};
 
     size_t grass_id;  ///< Easy access to floor CellType ID.
@@ -49,7 +49,6 @@ namespace cse491_team8 {
       agent.AddAction("attack", ATTACK);
       agent.AddAction("special", SPECIAL);
       agent.AddAction("buff", BUFF);
-      agent.AddAction("debuff", DEBUFF);
       agent.AddAction("help", HELP);
       agent.SetProperties("Strength", 10, "Health", 100, "Max_Health", 150, "Direction", 0, "Battling", false);
     }
@@ -418,32 +417,33 @@ namespace cse491_team8 {
           agent.SetProperty<bool>("Battling", false);
           other_agent.SetProperty<bool>("Battling", false);
           DropItems(agent, other_agent);
-//          this->RemoveAgent(other_agent.GetName());
-          auto killedagent = GetAgentID(other_agent.GetName());
-          delete_agents.insert(killedagent);
+          // this->RemoveAgent(other_agent.GetName());
+          // auto killedagent = GetAgentID(other_agent.GetName());
+          // delete_agents.insert(killedagent);
+          other_agent.SetProperty<bool>("Deleted", true);
 
         }
     }
 
-//    /// @brief Looks for adjacencies
-//    void UpdateWorld() override
-//    {
-//
-//    }
-//
-//    /// Runs agents, updates the world.
-//    void Run() override
-//    {
-//      run_over = false;
-//      while (!run_over) {
-//        RunAgents();
-//        UpdateWorld();
-//      }
-//    }
+    // /// @brief Looks for adjacencies
+    // void UpdateWorld() override
+    // {
+    // }
+
+    // /// Runs agents, updates the world.
+    // void Run() override
+    // {
+    //   run_over = false;
+    //   while (!run_over)
+    //   {
+    //     RunAgents();
+    //     UpdateWorld();
+    //   }
+    // }
 
       void RunAgents() override {
         for (auto & [id, agent_ptr] : agent_map) {
-          if (delete_agents.find(id) != delete_agents.end()) {
+          if (agent_ptr->HasProperty("Deleted")) {
             continue;
           }
           size_t action_id = agent_ptr->SelectAction(main_grid, type_options, item_map, agent_map);
@@ -666,13 +666,6 @@ namespace cse491_team8 {
             move = 'b';
             break;
         }
-        case DEBUFF:
-        {
-            new_position = agent.GetPosition();
-            agent.SetProperty<bool>("Battling", true);
-            move = 'd';
-            break;
-        }
         case HELP:
         {
             new_position = agent.GetPosition();
@@ -687,9 +680,8 @@ namespace cse491_team8 {
           for (auto agent_id : agents)
           {
               // Battle other agent near the player
-              if (!agent_map[agent_id]->IsInterface())
+              if (!agent_map[agent_id]->IsInterface() && !agent_map[agent_id]->HasProperty("Deleted"))
               {
-                  // agent.Notify(agent_map[agent_id]->GetName() + " is near the player");
                   agent_map[agent_id]->SetProperty<bool>("Battling", true);
                   StrengthCheck(*agent_map[agent_id], agent, move);
               }

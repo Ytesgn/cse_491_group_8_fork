@@ -24,9 +24,9 @@
 
 //#include "Worlds/MazeWorld.hpp"
 
-#include "../Worlds/ManualWorld.hpp"
-#include "../Worlds/GenerativeWorld.hpp"
-#include "../Worlds/BiomeGenerator.hpp"
+#include "../../Worlds/ManualWorld.hpp"
+#include "../../Worlds/GenerativeWorld.hpp"
+#include "../../Worlds/BiomeGenerator.hpp"
 
 
 

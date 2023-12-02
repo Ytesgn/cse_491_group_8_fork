@@ -228,7 +228,6 @@ public:
   /// @return A reference to this world.
   WorldBase & RemoveAgent(size_t agent_id) {
     agent_map.erase(agent_id);
-
     return *this;
   }
 
