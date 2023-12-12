@@ -43,12 +43,18 @@ int main()
   auto & a_star_agent = static_cast<walle::AStarAgent&>(world.AddAgent<walle::AStarAgent>("AStar 1"));
   a_star_agent.SetPosition(80, 111);
   a_star_agent.SetGoalPosition(80, 63);
+  world.AddItem("Axe", "Uses", 10, "symbol", 'P').SetPosition(a_star_agent.GetPosition());
+  world.DoActionAttemptItemPickup(a_star_agent, a_star_agent.GetPosition());
 
   auto & a_star_agent2 = static_cast<walle::AStarAgent&>(world.AddAgent<walle::AStarAgent>("AStar 2"));
   a_star_agent2.SetPosition(55, 14);
   a_star_agent2.SetGoalPosition(80, 120);
+  world.AddItem("Sword", "Strength", 10, "symbol", 't').SetPosition(a_star_agent2.GetPosition());
+  world.DoActionAttemptItemPickup(a_star_agent2, a_star_agent2.GetPosition());
 
-  world.AddAgent<cse491::PacingAgent>("Shark", "OnlyWater", 1).SetPosition(125, 140);
+  world.AddAgent<cse491::PacingAgent>("Shark1", "OnlyWater", 1).SetPosition(125, 140);
+  world.AddAgent<cse491::PacingAgent>("Shark2", "OnlyWater", 1).SetPosition(26, 90);
+  world.AddAgent<cse491::PacingAgent>("Shark3", "OnlyWater", 1).SetPosition(48, 108);
 
   auto & pacer_1 = world.GetAgent(world.GetAgentID("Pacer 1"));
   world.AddItem("Sword", "Strength", 15, "symbol", 't').SetPosition(pacer_1.GetPosition());
