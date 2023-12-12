@@ -26,6 +26,7 @@ int main()
   world.AddItem("Sword", "Strength", 8, "symbol", 't').SetPosition(18, 4);
   world.AddItem("Sword", "Strength", 5, "symbol", 't').SetPosition(27, 11);
   world.AddItem("Sword", "Strength", 4, "symbol", 't').SetPosition(65, 89);
+  world.AddItem("Sword", "Strength", 80, "symbol", 't').SetPosition(90, 63);
 
   world.AddItem("Health Potion", "Healing", 25, "symbol", 'j').SetPosition(38, 16);
   world.AddItem("Health Potion", "Healing", 30, "symbol", 'j').SetPosition(1, 18);
