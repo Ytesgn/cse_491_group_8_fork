@@ -43,6 +43,10 @@ int main()
   a_star_agent.SetPosition(80, 111);
   a_star_agent.SetGoalPosition(80, 63);
 
+  auto & a_star_agent2 = static_cast<walle::AStarAgent&>(world.AddAgent<walle::AStarAgent>("AStar 2"));
+  a_star_agent2.SetPosition(55, 14);
+  a_star_agent2.SetGoalPosition(80, 120);
+
   world.AddAgent<cse491::PacingAgent>("Shark", "OnlyWater", 1).SetPosition(125, 140);
 
   auto & pacer_1 = world.GetAgent(world.GetAgentID("Pacer 1"));
